@@ -1,16 +1,29 @@
 import os
-from discord.ext import commands
 
-bot = commands.Bot(command_prefix="!")
-TOKEN = os.getenv("DISCORD_TOKEN")
+import discord
+from dotenv import load_dotenv
 
-@bot.event
+load_dotenv()
+TOKEN = os.getenv('DISCORD_TOKEN')
+
+client = discord.Client()
+
+@client.event
 async def on_ready():
-    print(f"Logged in as {bot.user.name}({bot.user.id})")
+    guild = discord.utils.find(lambda g: g.name == GUILD, client.guilds)
+    print(
+        f'{client.user} is connected to the following guild:\n'
+        f'{guild.name}(id: {guild.id})'
+    )
+@client.event
+async def on_message(message):
+    if message.author == client.user:
+        return
 
-@bot.command()
-async def ping(ctx):
-    await ctx.send("pong")
+    if 'im ' in message.content:
+        user = message.content
+        user = user.replace('im ', '')
+        response = 'Hi ' + user + ', I\'m Ian\'s test bot'
+        await message.channel.send(response)
 
-if __name__ == "__main__":
-    bot.run(TOKEN)
+client.run(TOKEN)
